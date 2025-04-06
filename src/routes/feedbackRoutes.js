@@ -1,5 +1,3 @@
-// src/routes/feedbackRoutes.js
-
 const express = require("express");
 const router = express.Router();
 const Feedback = require("../models/Feedback");

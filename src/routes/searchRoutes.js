@@ -1,5 +1,3 @@
-// src/routes/searchRoutes.js (updated to handle different resource formats)
-
 const express = require("express");
 const router = express.Router();
 const Resource = require("../models/Resource");
@@ -24,7 +22,6 @@ router.get("/test", async (req, res) => {
   }
 });
 
-// Simple keyword search for all resources
 router.get("/keyword/:keyword", async (req, res) => {
   try {
     const keyword = req.params.keyword;
@@ -123,10 +120,10 @@ router.post("/", async (req, res) => {
         searchCriteria.$or = orConditions;
       }
     } else {
-      // Fallback to basic keyword matching
+      // Fallback
       const orConditions = [];
 
-      // Try to match keywords to categories
+      // Match keywords to categories
       const categoryKeywords = {
         food: ["food", "hungry", "meal", "eat", "nutrition"],
         housing: ["shelter", "housing", "homeless", "stay", "sleep"],
@@ -134,9 +131,7 @@ router.post("/", async (req, res) => {
         employment: ["job", "work", "employment", "career", "resume"],
       };
 
-      // Add conditions for each keyword
       keywords.forEach((keyword) => {
-        // Check if keyword matches a category
         for (const [category, words] of Object.entries(categoryKeywords)) {
           if (words.includes(keyword) || keyword.includes(category)) {
             orConditions.push({ category });
@@ -144,7 +139,6 @@ router.post("/", async (req, res) => {
           }
         }
 
-        // Add general search conditions
         orConditions.push({ name: { $regex: keyword, $options: "i" } });
         orConditions.push({ description: { $regex: keyword, $options: "i" } });
         orConditions.push({ type: { $regex: keyword, $options: "i" } });
@@ -161,12 +155,10 @@ router.post("/", async (req, res) => {
       JSON.stringify(searchCriteria, null, 2)
     );
 
-    // If search criteria is empty, return all resources
     if (Object.keys(searchCriteria).length === 0) {
       searchCriteria = {};
     }
 
-    // Execute the search
     const resources = await Resource.find(searchCriteria);
     console.log(`Found ${resources.length} matching resources`);
 
@@ -190,7 +182,7 @@ router.post("/", async (req, res) => {
       explanation = `Here are ${resources.length} resources that might help with your needs.`;
     }
 
-    // Log the search
+    // Log search
     try {
       const searchLog = new SearchLog({
         query: query,
@@ -206,7 +198,6 @@ router.post("/", async (req, res) => {
       await searchLog.save();
     } catch (error) {
       console.error("Error saving search log:", error);
-      // Continue without failing the request
     }
 
     // Return search results

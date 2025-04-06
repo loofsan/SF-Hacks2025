@@ -1,10 +1,6 @@
-// src/config/check-db.js
-// Run this with: node src/config/check-db.js
-
 require("dotenv").config();
 const mongoose = require("mongoose");
 
-// Connect to MongoDB
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log("Connected to MongoDB Atlas"))
@@ -13,7 +9,7 @@ mongoose
     process.exit(1);
   });
 
-// Define simplified schemas for checking
+// Define schemas for checking
 const resourceSchema = new mongoose.Schema({}, { strict: false });
 const categorySchema = new mongoose.Schema({}, { strict: false });
 
@@ -43,7 +39,6 @@ async function checkDatabase() {
       );
     }
 
-    // Close connection
     mongoose.connection.close();
     console.log("Database check complete");
   } catch (error) {

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Community Resource Navigator</title>
+    <title>Resource Overflow</title>
     <!-- Font Awesome Icons -->
     <link
       rel="stylesheet"
@@ -11,13 +11,18 @@
     />
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css" />
+    <!-- Custom Font -->
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=satoshi@1,2&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <header>
       <div class="container">
         <div class="flex justify-between items-center">
           <div>
-            <h1>Beacon</h1>
+            <h1>Resource Overflow</h1>
             <p>Connecting people with resources</p>
           </div>
           <nav>
@@ -35,6 +40,21 @@
     </header>
 
     <main class="container">
+      <section class="hero-image-container">
+        <img
+          src="/assets/logoimg.png"
+          alt="Resource Overflow Community Support"
+          class="hero-image"
+        />
+        <div class="image-description">
+          <h2>Find Support in Your Community</h2>
+          <p>
+            We connect you with local resources to help you and your family
+            thrive.
+          </p>
+        </div>
+      </section>
+
       <section class="card">
         <h2>How can we help you today?</h2>
         <p>
@@ -154,7 +174,7 @@
       <div class="container">
         <div class="flex flex-col md:flex-row justify-between items-center">
           <div style="margin-bottom: 1rem">
-            <h2>Beacon</h2>
+            <h2>Resource Overflow</h2>
             <p>Connecting people with resources since 2025</p>
           </div>
           <div style="display: flex; gap: 1rem">
@@ -209,15 +229,18 @@
 
           <div class="resource-actions">
             <a href="#" class="resource-website">
-              <i class="fas fa-external-link-alt"></i>
-              Website
+              <i class="fas fa-external-link-alt"></i>Website
             </a>
-            <div class="action-buttons">
-              <button class="directions-btn btn-small btn-outline-blue">
+            <div class="action-buttons flex">
+              <button
+                class="action-button-direction directions-btn btn-small btn-outline-blue"
+              >
                 <i class="fas fa-directions"></i>
                 Directions
               </button>
-              <button class="save-btn btn-small btn-outline-gray">
+              <button
+                class="action-button-save save-btn btn-small btn-outline-gray"
+              >
                 <i class="far fa-bookmark"></i>
                 Save
               </button>

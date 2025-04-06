@@ -1,9 +1,7 @@
-// src/models/Resource.js (updated to handle GeoJSON)
-
 const mongoose = require("mongoose");
 
 const hourSchema = new mongoose.Schema({
-  day: { type: Number, required: true }, // 0-6 for days of week
+  day: { type: Number, required: true }, // Days as numbers
   open: { type: String, default: "" },
   close: { type: String, default: "" },
 });

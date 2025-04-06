@@ -1,5 +1,3 @@
-// src/models/SearchLog.js
-
 const mongoose = require("mongoose");
 
 const searchLogSchema = new mongoose.Schema(
@@ -45,7 +43,6 @@ const searchLogSchema = new mongoose.Schema(
   }
 );
 
-// Create index for geospatial queries
 searchLogSchema.index({ user_location: "2dsphere" });
 
 const SearchLog = mongoose.model("SearchLog", searchLogSchema);

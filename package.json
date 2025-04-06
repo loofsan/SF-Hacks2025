@@ -1,5 +1,5 @@
 {
-  "name": "community-resource-navigator",
+  "name": "resource-overflow",
   "version": "1.0.0",
   "description": "A platform that helps underserved populations find and access local resources using natural language queries",
   "main": "src/server.js",
@@ -17,7 +17,7 @@
     "gemini-api",
     "mongodb-atlas"
   ],
-  "author": "SFHacks 2025 Team",
+  "author": "Lynn Aung",
   "license": "MIT",
   "dependencies": {
     "@google/generative-ai": "^0.3.0",
