@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Community Resource Navigator</title>
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div class="flex justify-between items-center">
+          <div>
+            <h1>Beacon</h1>
+            <p>Connecting people with resources</p>
+          </div>
+          <nav>
+            <ul>
+              <li>
+                <a href="/" class="active">Find Resources</a>
+              </li>
+              <li>
+                <a href="/submit.html">Submit a Resource</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <h2>How can we help you today?</h2>
+        <p>
+          Describe what you're looking for in your own words, and we'll help you
+          find the right resources.
+        </p>
+        <form id="search-form" class="space-y-4">
+          <div class="form-group">
+            <label for="search-query">What do you need help with?</label>
+            <textarea
+              id="search-query"
+              rows="3"
+              placeholder="For example: 'I need help finding food for my family' or 'Looking for healthcare services near the Mission'"
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-row">
+            <div>
+              <label for="location-input">Location (optional)</label>
+              <div style="position: relative">
+                <input
+                  type="text"
+                  id="location-input"
+                  placeholder="Enter a neighborhood or address"
+                />
+                <button
+                  type="button"
+                  id="location-detect"
+                  style="
+                    position: absolute;
+                    right: 12px;
+                    top: 12px;
+                    color: #2563eb;
+                    background: none;
+                    border: none;
+                    padding: 0;
+                  "
+                  title="Use my current location"
+                >
+                  <i class="fas fa-location-crosshairs"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="find-button">
+              <button type="submit" class="btn-primary">
+                <span>Find Resources</span>
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <!-- Add this right after the search form section -->
+      <div id="search-loader" class="loader-wrapper">
+        <div class="loader-circle"></div>
+        <div class="loader-circle"></div>
+        <div class="loader-circle"></div>
+        <div class="loader-shadow"></div>
+        <div class="loader-shadow"></div>
+        <div class="loader-shadow"></div>
+      </div>
+
+      <section
+        id="search-explanation"
+        class="alert alert-info hidden"
+      ></section>
+
+      <section id="results-container" class="space-y-6 hidden">
+        <h2 class="flex items-center">
+          <span>Available Resources</span>
+          <span
+            id="results-count"
+            style="
+              background-color: #2563eb;
+              color: white;
+              font-size: 0.875rem;
+              padding: 0.25rem 0.5rem;
+              border-radius: 9999px;
+              margin-left: 0.5rem;
+            "
+          ></span>
+        </h2>
+
+        <div id="resource-filters" class="filter-buttons">
+          <button class="filter-btn active" data-filter="all">
+            All Resources
+          </button>
+          <button class="filter-btn" data-filter="food">Food</button>
+          <button class="filter-btn" data-filter="housing">Housing</button>
+          <button class="filter-btn" data-filter="healthcare">
+            Healthcare
+          </button>
+          <button class="filter-btn" data-filter="employment">
+            Employment
+          </button>
+          <button class="filter-btn" data-filter="shelter">Shelter</button>
+          <button class="filter-btn" data-filter="other">Other</button>
+        </div>
+
+        <div id="resources-grid" class="resources-grid"></div>
+
+        <div id="no-results" class="alert alert-warning hidden">
+          <h3 style="font-size: 1.125rem; font-weight: 500; color: #92400e">
+            No matching resources found
+          </h3>
+          <p style="color: #b45309">
+            Try broadening your search or selecting a different category.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div style="margin-bottom: 1rem">
+            <h2>Beacon</h2>
+            <p>Connecting people with resources since 2025</p>
+          </div>
+          <div style="display: flex; gap: 1rem">
+            <a href="#">About</a>
+            <a href="#">Resource Providers</a>
+            <a href="#">Privacy</a>
+            <a href="#">Contact</a>
+          </div>
+        </div>
+        <div class="footer-border">
+          <p>Created for SFHacks 2025 - Tech For Good</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Resource Card Template -->
+    <template id="resource-card-template">
+      <div class="resource-card">
+        <div class="category-banner">
+          <span class="category-name"></span>
+          <span class="distance-badge"></span>
+        </div>
+        <div class="resource-details">
+          <h3 class="resource-name"></h3>
+          <p class="resource-description"></p>
+
+          <div class="resource-info">
+            <div>
+              <i class="fas fa-map-marker-alt" style="color: #ef4444"></i>
+              <span class="resource-address"></span>
+            </div>
+            <div>
+              <i class="fas fa-phone" style="color: #10b981"></i>
+              <span class="resource-phone"></span>
+            </div>
+            <div class="resource-hours-container">
+              <i class="fas fa-clock" style="color: #3b82f6"></i>
+              <div class="resource-hours-content">
+                <div class="today-hours"></div>
+                <button class="view-hours-btn">View all hours</button>
+                <div class="all-hours-container"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="resource-tags"></div>
+
+          <div
+            class="resource-eligibility"
+            style="font-size: 0.875rem; color: #4b5563; margin-bottom: 1rem"
+          ></div>
+
+          <div class="resource-actions">
+            <a href="#" class="resource-website">
+              <i class="fas fa-external-link-alt"></i>
+              Website
+            </a>
+            <div class="action-buttons">
+              <button class="directions-btn btn-small btn-outline-blue">
+                <i class="fas fa-directions"></i>
+                Directions
+              </button>
+              <button class="save-btn btn-small btn-outline-gray">
+                <i class="far fa-bookmark"></i>
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <script src="js/main.js"></script>
+  </body>
+</html>

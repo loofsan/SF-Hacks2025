@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Submit a Resource - Community Resource Navigator</title>
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/submit.css" />
+    <!-- Custom Font -->
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=satoshi@1,2&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div class="flex justify-between items-center">
+          <div>
+            <h1>Beacon</h1>
+            <p>Connecting people with resources</p>
+          </div>
+          <nav>
+            <ul>
+              <li>
+                <a href="/">Find Resources</a>
+              </li>
+              <li>
+                <a href="/submit.html" class="active">Submit a Resource</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <h2>Submit a Community Resource</h2>
+        <p>
+          Know of a resource that could help others in the community? Share it
+          here so others can find it. This could be a food bank, shelter,
+          healthcare service, employment opportunity, or any other resource that
+          supports community members in need.
+        </p>
+
+        <form id="resource-form">
+          <!-- Basic Information -->
+          <div class="form-section section-blue">
+            <h3 class="section-title title-blue">Basic Information</h3>
+            <div class="grid grid-cols-2">
+              <div>
+                <label for="resource-name">Resource Name*</label>
+                <input
+                  type="text"
+                  id="resource-name"
+                  placeholder="e.g., Mission Food Bank"
+                  required
+                />
+              </div>
+              <div>
+                <label for="resource-type">Resource Type*</label>
+                <select id="resource-type" required>
+                  <option value="">Select a type</option>
+                  <option value="shelter">Shelter</option>
+                  <option value="food bank">Food Bank</option>
+                  <option value="food pantry">Food Pantry</option>
+                  <option value="meal program">Meal Program</option>
+                  <option value="medical clinic">Medical Clinic</option>
+                  <option value="health center">Health Center</option>
+                  <option value="mental health">Mental Health Services</option>
+                  <option value="employment center">Employment Center</option>
+                  <option value="education">Education Resources</option>
+                  <option value="legal">Legal Services</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label for="resource-description">Description*</label>
+              <textarea
+                id="resource-description"
+                placeholder="Describe what services this resource provides..."
+                rows="3"
+                required
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Location Information -->
+          <div class="form-section section-green">
+            <h3 class="section-title title-green">Location Information</h3>
+            <div>
+              <label for="resource-address">Address*</label>
+              <input
+                type="text"
+                id="resource-address"
+                placeholder="Street address, city, state, zip"
+                required
+              />
+            </div>
+
+            <div class="grid grid-cols-2 mt-4">
+              <div>
+                <label for="resource-latitude">Latitude</label>
+                <input
+                  type="number"
+                  id="resource-latitude"
+                  placeholder="e.g., 37.7749"
+                  step="0.0001"
+                />
+              </div>
+              <div>
+                <label for="resource-longitude">Longitude</label>
+                <input
+                  type="number"
+                  id="resource-longitude"
+                  placeholder="e.g., -122.4194"
+                  step="0.0001"
+                />
+                <p class="helper-text">
+                  <button
+                    type="button"
+                    id="detect-location"
+                    style="
+                      color: #2563eb;
+                      background: none;
+                      border: none;
+                      padding: 0;
+                      display: inline;
+                      font-size: inherit;
+                      cursor: pointer;
+                    "
+                  >
+                    <i class="fas fa-location-crosshairs"></i> Detect my
+                    location
+                  </button>
+                  (Optional, but helps with map placement)
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Information -->
+          <div class="form-section section-purple">
+            <h3 class="section-title title-purple">Contact Information</h3>
+            <div class="grid md:grid-cols-3">
+              <div>
+                <label for="resource-phone">Phone Number</label>
+                <input
+                  type="tel"
+                  id="resource-phone"
+                  placeholder="e.g., 415-555-0123"
+                />
+              </div>
+              <div>
+                <label for="resource-email">Email</label>
+                <input
+                  type="email"
+                  id="resource-email"
+                  placeholder="e.g., info@example.org"
+                />
+              </div>
+              <div>
+                <label for="resource-website">Website</label>
+                <input
+                  type="url"
+                  id="resource-website"
+                  placeholder="e.g., https://example.org"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Hours of Operation -->
+          <div class="form-section section-yellow">
+            <h3 class="section-title title-yellow">Hours of Operation</h3>
+            <p class="helper-text">
+              Enter hours in 24-hour format (e.g., 09:00-17:00) or "24 hours" if
+              open all day.
+            </p>
+
+            <div class="grid mt-2 grid-cols-4" id="hours-container">
+              <!-- Monday -->
+              <div>
+                <label>Monday</label>
+                <input
+                  type="text"
+                  class="day-hours"
+                  placeholder="e.g., 9:00-17:00"
+                  data-day="0"
+                />
+              </div>
+
+              <!-- Tuesday -->
+              <div>
+                <label>Tuesday</label>
+                <input
+                  type="text"
+                  class="day-hours"
+                  placeholder="e.g., 9:00-17:00"
+                  data-day="1"
+                />
+              </div>
+
+              <!-- Wednesday -->
+              <div>
+                <label>Wednesday</label>
+                <input
+                  type="text"
+                  class="day-hours"
+                  placeholder="e.g., 9:00-17:00"
+                  data-day="2"
+                />
+              </div>
+
+              <!-- Thursday -->
+              <div>
+                <label>Thursday</label>
+                <input
+                  type="text"
+                  class="day-hours"
+                  placeholder="e.g., 9:00-17:00"
+                  data-day="3"
+                />
+              </div>
+
+              <!-- Friday -->
+              <div>
+                <label>Friday</label>
+                <input
+                  type="text"
+                  class="day-hours"
+                  placeholder="e.g., 9:00-17:00"
+                  data-day="4"
+                />
+              </div>
+
+              <!-- Saturday -->
+              <div>
+                <label>Saturday</label>
+                <input
+                  type="text"
+                  class="day-hours"
+                  placeholder="e.g., 10:00-14:00"
+                  data-day="5"
+                />
+              </div>
+
+              <!-- Sunday -->
+              <div>
+                <label>Sunday</label>
+                <input
+                  type="text"
+                  class="day-hours"
+                  placeholder="e.g., Closed"
+                  data-day="6"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Details -->
+          <div class="form-section section-red">
+            <h3 class="section-title title-red">Additional Details</h3>
+
+            <div class="mb-4">
+              <label for="resource-services"
+                >Services Offered (comma separated)*</label
+              >
+              <input
+                type="text"
+                id="resource-services"
+                placeholder="e.g., Food assistance, Housing navigation, Job search help"
+                required
+              />
+            </div>
+
+            <div class="mb-4">
+              <label for="resource-requirements"
+                >Requirements (comma separated)</label
+              >
+              <input
+                type="text"
+                id="resource-requirements"
+                placeholder="e.g., ID, Proof of address, Income verification"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label for="resource-languages"
+                >Languages Supported (comma separated)</label
+              >
+              <input
+                type="text"
+                id="resource-languages"
+                placeholder="e.g., English, Spanish, Cantonese"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label>Accessibility Features</label>
+              <div class="checkbox-group">
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    class="accessibility-checkbox"
+                    value="wheelchair"
+                  />
+                  <span>Wheelchair accessible</span>
+                </label>
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    class="accessibility-checkbox"
+                    value="transit"
+                  />
+                  <span>Public transit nearby</span>
+                </label>
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    class="accessibility-checkbox"
+                    value="asl"
+                  />
+                  <span>ASL available</span>
+                </label>
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    class="accessibility-checkbox"
+                    value="parking"
+                  />
+                  <span>Accessible parking</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label for="resource-capacity">Capacity/Limitations</label>
+              <input
+                type="text"
+                id="resource-capacity"
+                placeholder="e.g., Serves up to 200 families daily"
+              />
+            </div>
+          </div>
+
+          <!-- Submission Section -->
+          <div class="form-actions">
+            <div class="required-notice">* Required fields</div>
+            <div class="btn-group">
+              <button type="button" id="reset-form" class="btn-secondary">
+                <span>Reset Form</span>
+              </button>
+              <button type="submit" class="btn-primary">
+                <span>Submit Resource</span>
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <!-- Success Message (hidden by default) -->
+      <section id="success-message" class="success-message hidden">
+        <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="success-content">
+          <h3 class="success-title">Resource submitted successfully!</h3>
+          <div class="success-text">
+            <p>
+              Thank you for contributing to the Community Resource Navigator.
+              Your submission helps connect people with valuable resources.
+            </p>
+            <p class="success-links">
+              <a href="/" class="success-link">Return to homepage</a>
+              or
+              <button
+                id="submit-another"
+                class="success-link"
+                style="
+                  background: none;
+                  border: none;
+                  cursor: pointer;
+                  padding: 0;
+                  font: inherit;
+                  text-decoration: underline;
+                "
+              >
+                submit another resource
+              </button>
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="flex flex-row justify-between items-center">
+          <div style="margin-bottom: 1rem">
+            <h2>Beacon</h2>
+            <p>Connecting people with resources since 2025</p>
+          </div>
+          <div style="display: flex; gap: 1rem">
+            <a href="#">About</a>
+            <a href="#">Resource Providers</a>
+            <a href="#">Privacy</a>
+            <a href="#">Contact</a>
+          </div>
+        </div>
+        <div class="footer-border">
+          <p>Created for SFHacks 2025 - Tech For Good</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/submit.js"></script>
+  </body>
+</html>
