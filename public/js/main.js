@@ -1126,3 +1126,149 @@ function getResourceColorClass(type) {
     return "bg-gray-600";
   }
 }
+
+let recognition;
+let isListening = false;
+
+// Initialize speech recognition if available
+function initSpeechRecognition() {
+  // Check if the browser supports speech recognition
+  if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+    // Create a speech recognition instance
+    recognition = new (window.SpeechRecognition ||
+      window.webkitSpeechRecognition)();
+
+    // Configure the recognition
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = "en-US"; // Set language to English (can be made configurable)
+
+    // Event handlers
+    recognition.onstart = function () {
+      isListening = true;
+      const micButton = document.getElementById("speech-input-button");
+      if (micButton) {
+        micButton.innerHTML =
+          '<i class="fas fa-microphone" style="color: #ef4444;"></i>';
+        micButton.title = "Listening... Click to stop";
+      }
+
+      // Show a visual indicator
+      const searchQuery = document.getElementById("search-query");
+      const placeholder = searchQuery.placeholder;
+      searchQuery.placeholder = "Listening...";
+      searchQuery.dataset.originalPlaceholder = placeholder;
+    };
+
+    recognition.onend = function () {
+      isListening = false;
+      const micButton = document.getElementById("speech-input-button");
+      if (micButton) {
+        micButton.innerHTML = '<i class="fas fa-microphone"></i>';
+        micButton.title = "Speak your search query";
+      }
+
+      // Restore placeholder
+      const searchQuery = document.getElementById("search-query");
+      searchQuery.placeholder =
+        searchQuery.dataset.originalPlaceholder ||
+        "For example: 'I need help finding food for my family' or 'Looking for healthcare services near the Mission'";
+    };
+
+    recognition.onresult = function (event) {
+      const result = event.results[0];
+      const transcript = result[0].transcript;
+
+      // Update the search input with the transcribed text
+      const searchQuery = document.getElementById("search-query");
+      searchQuery.value = transcript;
+
+      // If the result is final (user has stopped speaking)
+      if (result.isFinal) {
+        // Stop listening
+        recognition.stop();
+
+        // If it's a reasonable length query, submit the search automatically
+        if (transcript.length > 5) {
+          setTimeout(() => {
+            // Submit the search form
+            const searchForm = document.getElementById("search-form");
+            if (searchForm) {
+              searchForm.dispatchEvent(new Event("submit"));
+            }
+          }, 1000); // Small delay to allow the user to see what was transcribed
+        }
+      }
+    };
+
+    recognition.onerror = function (event) {
+      console.error("Speech recognition error:", event.error);
+      isListening = false;
+
+      const micButton = document.getElementById("speech-input-button");
+      if (micButton) {
+        micButton.innerHTML = '<i class="fas fa-microphone"></i>';
+      }
+
+      // Show error message
+      if (event.error === "not-allowed") {
+        alert(
+          "Microphone access was denied. Please allow microphone access to use voice search."
+        );
+      } else if (event.error === "no-speech") {
+        // No speech detected, just reset
+      } else {
+        alert(
+          "Error with speech recognition. Please try again or type your search."
+        );
+      }
+
+      // Restore placeholder
+      const searchQuery = document.getElementById("search-query");
+      searchQuery.placeholder =
+        searchQuery.dataset.originalPlaceholder ||
+        "For example: 'I need help finding food for my family' or 'Looking for healthcare services near the Mission'";
+    };
+
+    // Add mic button click handler
+    document.addEventListener("DOMContentLoaded", function () {
+      const micButton = document.getElementById("speech-input-button");
+      if (micButton) {
+        micButton.addEventListener("click", toggleSpeechRecognition);
+      }
+    });
+
+    return true;
+  } else {
+    console.log("Speech recognition not supported in this browser.");
+
+    // Hide the mic button if speech recognition is not supported
+    document.addEventListener("DOMContentLoaded", function () {
+      const micButton = document.getElementById("speech-input-button");
+      if (micButton) {
+        micButton.style.display = "none";
+      }
+    });
+
+    return false;
+  }
+}
+
+// Toggle speech recognition on/off
+function toggleSpeechRecognition() {
+  if (!recognition) {
+    if (!initSpeechRecognition()) {
+      alert("Speech recognition is not supported in your browser.");
+      return;
+    }
+  }
+
+  if (isListening) {
+    recognition.stop();
+  } else {
+    recognition.start();
+  }
+}
+
+// Initialize speech recognition when the page loads
+initSpeechRecognition();
