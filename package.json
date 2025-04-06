@@ -7,6 +7,7 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "seed": "node src/config/mongoose-seed.js",
+    "generate-embeddings": "node src/scripts/generateEmbeddings.js",
     "check-db": "node src/config/check-db.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

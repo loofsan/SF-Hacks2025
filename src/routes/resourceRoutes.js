@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Resource = require("../models/Resource");
+const { findSimilarResources } = require("../services/embeddingService");
 
 // Get all resources
 router.get("/", async (req, res) => {
@@ -75,6 +76,21 @@ router.get("/nearby/:longitude/:latitude/:maxDistance?", async (req, res) => {
     res.json(resources);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+});
+
+// Get similar resources endpoint
+router.get("/:id/similar", async (req, res) => {
+  try {
+    const resourceId = req.params.id;
+    const limit = parseInt(req.query.limit) || 3;
+
+    const similarResources = await findSimilarResources(resourceId, limit);
+
+    res.json(similarResources);
+  } catch (error) {
+    console.error("Error getting similar resources:", error);
+    res.status(500).json({ message: error.message });
   }
 });
 

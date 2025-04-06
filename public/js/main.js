@@ -499,6 +499,115 @@ function createResourceCard(resource) {
     logResourceView(resource._id);
   });
 
+  setTimeout(() => {
+    // Use the resourceId to find the card in the DOM after it's been appended
+    const cardInDom = document.querySelector(
+      `.resource-card[data-id="${resource._id}"]`
+    );
+    if (!cardInDom) return; // Card not found in DOM
+
+    // Now add the similar resources section
+    const similarSection = document.createElement("div");
+    similarSection.className = "similar-resources";
+    similarSection.style.marginTop = "1rem";
+    similarSection.style.paddingTop = "1rem";
+    similarSection.style.borderTop = "1px solid #e5e7eb";
+
+    // Add similar resources content
+    similarSection.innerHTML = `
+    <h4 style="font-weight: 600; margin-bottom: 0.75rem; display: flex; align-items: center; font-size: 0.95rem;">
+      <i class="fas fa-link" style="color: #3b82f6; margin-right: 0.5rem;"></i>
+      Similar Resources
+    </h4>
+    <div id="similar-items-${resource._id}">
+      <div style="font-size: 0.9rem; color: #6b7280;">Looking for similar resources...</div>
+    </div>
+  `;
+
+    // Append to the card
+    cardInDom.appendChild(similarSection);
+
+    // Fetch similar resources without logging errors
+    fetch(`/api/resources/${resource._id}/similar?limit=3`)
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to fetch");
+        return response.json();
+      })
+      .then((similarResources) => {
+        const container = document.getElementById(
+          `similar-items-${resource._id}`
+        );
+        if (!container) return;
+
+        if (!similarResources || similarResources.length === 0) {
+          similarSection.style.display = "none";
+          return;
+        }
+
+        container.innerHTML = "";
+
+        similarResources.forEach((resource) => {
+          const item = document.createElement("div");
+          item.style.padding = "0.5rem";
+          item.style.backgroundColor = "var(--surface-hover)";
+          item.style.borderRadius = "0.5rem";
+          item.style.marginBottom = "0.5rem";
+          item.style.cursor = "pointer";
+          item.style.display = "flex";
+          item.style.alignItems = "center";
+          item.style.gap = "0.75rem";
+
+          // Determine icon and color
+          const type = resource.type || resource.category || "other";
+          const iconClass = type.includes("food")
+            ? "fas fa-utensils"
+            : type.includes("shelter") || type.includes("housing")
+            ? "fas fa-home"
+            : type.includes("health")
+            ? "fas fa-heartbeat"
+            : type.includes("employ")
+            ? "fas fa-briefcase"
+            : "fas fa-hands-helping";
+
+          const bgColor = type.includes("food")
+            ? "#16a34a"
+            : type.includes("shelter") || type.includes("housing")
+            ? "#2563eb"
+            : type.includes("health")
+            ? "#dc2626"
+            : type.includes("employ")
+            ? "#7c3aed"
+            : "#4b5563";
+
+          item.innerHTML = `
+          <div style="width: 2rem; height: 2rem; border-radius: 0.5rem; background-color: ${bgColor}; color: white; display: flex; align-items: center; justify-content: center;">
+            <i class="${iconClass}"></i>
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-weight: 500; margin-bottom: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${
+              resource.name
+            }</div>
+            <div style="font-size: 0.75rem; color: #6b7280; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+              ${
+                resource.description
+                  ? resource.description.length > 100
+                    ? resource.description.substring(0, 100) + "..."
+                    : resource.description
+                  : type.charAt(0).toUpperCase() + type.slice(1) + " resource"
+              }
+            </div>
+          </div>
+        `;
+
+          container.appendChild(item);
+        });
+      })
+      .catch(() => {
+        // Silently handle errors by hiding the section
+        similarSection.style.display = "none";
+      });
+  }, 500);
+
   return card;
 }
 
@@ -793,4 +902,227 @@ function getResourceCategory(resource) {
 
   // Default
   return "other";
+}
+
+// Load similar resources for a resource card
+async function loadSimilarResources(resourceId, card) {
+  try {
+    // Debug: Log the card DOM structure
+    console.log("Card element:", card);
+
+    // First, make sure the card is a DOM element
+    if (!card || !card.querySelector) {
+      console.log("Invalid card element");
+      return;
+    }
+
+    // Debug: List all elements in the card
+    console.log("Card child elements:", card.children);
+    console.log("Card classes:", card.className);
+
+    // Try different selectors to find resource details
+    const resourceDetails =
+      card.querySelector(".resource-details") ||
+      card.querySelector(".resource-card .resource-details") ||
+      card.querySelector("div > div");
+
+    console.log("Resource details found:", resourceDetails);
+
+    if (!resourceDetails) {
+      console.log("Resource details not found");
+      return;
+    }
+    // Check if similar resources section already exists, if not create it
+    let similarResourcesSection = card.querySelector(".similar-resources");
+    let similarItemsContainer;
+
+    if (!similarResourcesSection) {
+      // Create the section
+      similarResourcesSection = document.createElement("div");
+      similarResourcesSection.className = "similar-resources";
+
+      // Create the title
+      const title = document.createElement("h4");
+      title.className = "similar-resources-title";
+      title.innerHTML =
+        '<i class="fas fa-link"></i> Similar Resources You Might Need';
+      similarResourcesSection.appendChild(title);
+
+      // Create the items container
+      similarItemsContainer = document.createElement("div");
+      similarItemsContainer.className = "similar-items";
+      similarResourcesSection.appendChild(similarItemsContainer);
+
+      // Add the section to the resource details
+      resourceDetails.appendChild(similarResourcesSection);
+    } else {
+      // Get existing items container
+      similarItemsContainer =
+        similarResourcesSection.querySelector(".similar-items");
+    }
+
+    // Show loading state
+    similarResourcesSection.classList.remove("hidden");
+    similarItemsContainer.innerHTML =
+      '<div class="similar-resources-loading">Looking for similar resources...</div>';
+
+    // Fetch similar resources
+    const response = await fetch(
+      `/api/resources/${resourceId}/similar?limit=3`
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch similar resources");
+    }
+
+    const similarResources = await response.json();
+
+    // Hide the section if no similar resources found
+    if (!similarResources || similarResources.length === 0) {
+      similarResourcesSection.classList.add("hidden");
+      return;
+    }
+
+    // Clear loading message
+    similarItemsContainer.innerHTML = "";
+
+    // Add similar resources to the container
+    similarResources.forEach((resource) => {
+      // Create a simple item for each similar resource
+      const item = document.createElement("div");
+      item.className = "similar-item";
+      item.setAttribute("data-id", resource._id);
+
+      // Determine icon and color based on resource type
+      const type = resource.type || resource.category || "other";
+      const iconClass = getResourceIconClass(type);
+      const bgColorClass = getResourceColorClass(type);
+
+      item.innerHTML = `
+        <div class="similar-item-icon ${bgColorClass}">
+          <i class="${iconClass}"></i>
+        </div>
+        <div class="similar-item-content">
+          <div class="similar-item-title">${resource.name}</div>
+          <div class="similar-item-description">${
+            resource.description
+              ? resource.description.length > 100
+                ? resource.description.substring(0, 100) + "..."
+                : resource.description
+              : type.charAt(0).toUpperCase() + type.slice(1) + " resource"
+          }</div>
+        </div>
+      `;
+
+      // Add click handler
+      item.addEventListener("click", () => {
+        // Navigate to the resource or highlight it if already on page
+        const existingResource = document.querySelector(
+          `.resource-card[data-id="${resource._id}"]`
+        );
+        if (existingResource) {
+          existingResource.scrollIntoView({ behavior: "smooth" });
+          existingResource.classList.add("highlight-resource");
+          setTimeout(() => {
+            existingResource.classList.remove("highlight-resource");
+          }, 2000);
+        } else {
+          // Alternative: could load the resource details or navigate to it
+          console.log("Resource not on page:", resource._id);
+        }
+      });
+
+      similarItemsContainer.appendChild(item);
+    });
+
+    // Add some basic styles if they're not already in your CSS
+    if (!document.querySelector("#similar-resources-styles")) {
+      const styles = document.createElement("style");
+      styles.id = "similar-resources-styles";
+      styles.textContent = `
+        .similar-resources { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; }
+        .similar-resources-title { font-size: 1rem; font-weight: 600; color: #4b5563; margin-bottom: 0.75rem; display: flex; align-items: center; }
+        .similar-resources-title i { margin-right: 0.5rem; color: #3b82f6; }
+        .similar-items { display: flex; flex-direction: column; gap: 0.5rem; }
+        .similar-item { padding: 0.75rem; background-color: #f9fafb; border-radius: 0.5rem; transition: all 0.2s; cursor: pointer; display: flex; align-items: center; gap: 0.75rem; }
+        .similar-item:hover { background-color: #f3f4f6; transform: translateY(-1px); }
+        .similar-item-icon { width: 2rem; height: 2rem; border-radius: 0.5rem; color: white; display: flex; align-items: center; justify-content: center; }
+        .similar-item-content { flex: 1; min-width: 0; }
+        .similar-item-title { font-weight: 500; margin-bottom: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .similar-item-description { font-size: 0.75rem; color: #6b7280; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .highlight-resource { animation: highlight-pulse 2s ease-in-out; box-shadow: 0 0 0 2px #3b82f6; }
+        @keyframes highlight-pulse { 0%, 100% { box-shadow: 0 0 0 2px #3b82f6; transform: scale(1); } 50% { box-shadow: 0 0 0 4px #60a5fa; transform: scale(1.02); } }
+      `;
+      document.head.appendChild(styles);
+    }
+  } catch (error) {
+    console.error("Error loading similar resources:", error);
+    // Don't try to access the classList if the section might not exist
+  }
+}
+
+// Helper function to get icon class for a resource type
+function getResourceIconClass(type) {
+  type = type.toLowerCase();
+
+  if (
+    type.includes("food") ||
+    type.includes("meal") ||
+    type.includes("pantry")
+  ) {
+    return "fas fa-utensils";
+  } else if (
+    type.includes("shelter") ||
+    type.includes("housing") ||
+    type.includes("home")
+  ) {
+    return "fas fa-home";
+  } else if (
+    type.includes("health") ||
+    type.includes("medical") ||
+    type.includes("clinic")
+  ) {
+    return "fas fa-heartbeat";
+  } else if (
+    type.includes("employ") ||
+    type.includes("job") ||
+    type.includes("career")
+  ) {
+    return "fas fa-briefcase";
+  } else {
+    return "fas fa-hands-helping";
+  }
+}
+
+// Helper function to get color class for a resource type
+function getResourceColorClass(type) {
+  type = type.toLowerCase();
+
+  if (
+    type.includes("food") ||
+    type.includes("meal") ||
+    type.includes("pantry")
+  ) {
+    return "bg-green-600";
+  } else if (
+    type.includes("shelter") ||
+    type.includes("housing") ||
+    type.includes("home")
+  ) {
+    return "bg-blue-600";
+  } else if (
+    type.includes("health") ||
+    type.includes("medical") ||
+    type.includes("clinic")
+  ) {
+    return "bg-red-600";
+  } else if (
+    type.includes("employ") ||
+    type.includes("job") ||
+    type.includes("career")
+  ) {
+    return "bg-purple-600";
+  } else {
+    return "bg-gray-600";
+  }
 }

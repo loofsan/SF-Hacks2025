@@ -109,6 +109,24 @@ resourceSchema.virtual("categoryFromType").get(function () {
   return this.category || typeToCategory[this.type] || "other";
 });
 
+resourceSchema.add({
+  embedding: {
+    type: [Number],
+    index: false, // We'll use vector search rather than indexing directly
+    default: null,
+  },
+});
+
+resourceSchema.index(
+  { embedding: "vectorSearch" },
+  {
+    vectorSearchOptions: {
+      dimension: 768, // Dimension of the embedding vectors
+      similarity: "cosine", // Similarity metric
+    },
+  }
+);
+
 const Resource = mongoose.model("Resource", resourceSchema);
 
 module.exports = Resource;

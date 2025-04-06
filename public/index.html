@@ -64,12 +64,31 @@
         <form id="search-form" class="space-y-4">
           <div class="form-group">
             <label for="search-query">What do you need help with?</label>
-            <textarea
-              id="search-query"
-              rows="3"
-              placeholder="For example: 'I need help finding food for my family' or 'Looking for healthcare services near the Mission'"
-              required
-            ></textarea>
+            <div class="flex items-center">
+              <textarea
+                id="search-query"
+                rows="3"
+                placeholder="For example: 'I need help finding food for my family' or 'Looking for healthcare services near the Mission'"
+                required
+              ></textarea>
+              <div class="mic-button-container">
+                <button
+                  type="button"
+                  id="speech-input-button"
+                  title="Speak your search query"
+                  style="
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    color: var(--success);
+                    padding: 1rem;
+                    font-size: 1.5rem;
+                  "
+                >
+                  <i class="fas fa-microphone"></i>
+                </button>
+              </div>
+            </div>
           </div>
 
           <div class="form-row">
